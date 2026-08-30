@@ -9,7 +9,6 @@ import { VerifiedInfoDialog } from "@/components/profile/VerifiedInfoDialog";
 import { monthYear } from "@/components/profile/VerifiedBadgePopover";
 import { ProfileBadge } from "@/components/profile/ProfileBadge";
 import {
-  avatarFrameStyle,
   backgroundLayers,
   bannerStyleOf,
   blockButtonStyle,
@@ -22,6 +21,7 @@ import {
   BIO_LOCALE_LABEL,
   type BioLocale,
 } from "@/lib/profile-display";
+import { AvatarFrameWrapper } from "@/components/profile/AvatarFrameWrapper";
 import { downloadVCard } from "@/lib/vcard";
 
 import { useI18n } from "@/lib/i18n";
@@ -66,7 +66,6 @@ export function ProfileView({
   };
   const surface = backgroundLayers(prefs.backgroundStyle, canvas);
   const banner = bannerStyleOf(prefs, t);
-  const frame = avatarFrameStyle(prefs.avatarFrame, t);
   const nameStyle = nameAccentStyle(prefs.nameAccent, t);
 
   const showBadge = Boolean(profile.verified) && prefs.badgeVisible;
@@ -102,7 +101,7 @@ export function ProfileView({
       <div
         className={`relative mx-auto flex w-full flex-col items-center ${wide ? "max-w-3xl" : "max-w-md"}`}
       >
-        <div style={frame} className="inline-flex">
+        <AvatarFrameWrapper frame={prefs.avatarFrame} theme={t}>
           {profile.avatar_url ? (
             <img
               src={profile.avatar_url}

@@ -79,7 +79,7 @@ export const AVATAR_FRAME_DEFS: AvatarFrameDef[] = [
   { id: "laurel_gold", label: "Gouden lauwer", category: "royal", overlay: "laurel" },
   { id: "royal_crown", label: "Koninklijke kroon", category: "royal", overlay: "crown" },
   { id: "gold_chain", label: "Gouden ketting", category: "royal", overlay: "chain" },
-  { id: "cosmic_halo", label: "Kosmische halo", category: "royal", animation: "rout-frame-spin" },
+  { id: "cosmic_halo", label: "Kosmische halo", category: "royal", animation: "rout-frame-pulse" },
   { id: "vintage_wood", label: "Vintage hout", category: "royal" },
   { id: "fire_glow", label: "Vuurgloed", category: "royal", animation: "rout-frame-flicker" },
 
