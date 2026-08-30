@@ -12,8 +12,15 @@ export type BadgeNameFormat = "full" | "initials" | "lower";
 export type IdentityMode = "legal" | "private";
 export type BackgroundStyle = "solid" | "grid" | "gradient" | "dots" | "mesh" | "noise";
 export type Typography = "sans" | "serif" | "mono";
-/** Discord-achtige avatarrand, maar in ROUT's ingetogen luxe-register. */
-export type AvatarFrame = "none" | "gold" | "neon" | "double" | "aurora";
+/** 24 avatarkaders — definities leven in `@/lib/avatar-frames`. */
+export type { AvatarFrame } from "./avatar-frames";
+export {
+  AVATAR_FRAME_DEFS,
+  AVATAR_FRAME_CATEGORIES,
+  avatarFrameLabel,
+  avatarFrameStyle,
+} from "./avatar-frames";
+import { normalizeAvatarFrame, type AvatarFrame } from "./avatar-frames";
 export type BannerStyle = "none" | "gradient" | "image";
 export type NameAccent = "classic" | "gold" | "neon" | "chrome";
 
