@@ -1436,6 +1436,10 @@ export default function Admin() {
                             <p className="font-mono text-[10px] text-muted-foreground">
                               {row.userId}
                             </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              {locationBadge(row.lastCountry, row.lastCity)}
+                            </p>
+
                             <SyncBadge
                               status={row.aliasSyncStatus}
                               at={row.aliasSyncedAt}
