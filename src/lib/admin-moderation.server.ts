@@ -73,8 +73,11 @@ function mapProfile(row: ProfileRow, email: string | null): ModeratedUser {
     aliasSyncAttempts: Number(row["alias_sync_attempts"] ?? 0),
     aliasSyncedAt: (row["alias_synced_at"] as string | null) ?? null,
     aliasSyncError: (row["alias_sync_error"] as string | null) ?? null,
+    lastCountry: (row["last_country"] as string | null) ?? null,
+    lastCity: (row["last_city"] as string | null) ?? null,
   };
 }
+
 
 async function emailFor(userId: string): Promise<string | null> {
   const { dbAdmin } = await import("@/lib/db/admin.server");
