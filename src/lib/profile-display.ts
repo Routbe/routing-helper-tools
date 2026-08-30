@@ -173,11 +173,7 @@ export function parseDisplayPrefs(raw: unknown): ProfileDisplayPrefs {
       "solid",
     ),
     typography: oneOf(r["typography"], ["sans", "serif", "mono"] as const, "sans"),
-    avatarFrame: oneOf(
-      r["avatarFrame"],
-      ["none", "gold", "neon", "double", "aurora"] as const,
-      "none",
-    ),
+    avatarFrame: normalizeAvatarFrame(r["avatarFrame"]),
     bannerStyle: oneOf(r["bannerStyle"], ["none", "gradient", "image"] as const, "none"),
     bannerImageUrl: urlOrNull(r["bannerImageUrl"]),
     bannerFrom: colorOrNull(r["bannerFrom"]),
