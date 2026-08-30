@@ -120,8 +120,28 @@ export async function applyStripeEvent(event: StripeEvent): Promise<string> {
     }
   }
 
+  // Stripe Connect: de payout-status van een maker bijhouden in Neon.
+  if (event.type === "account.updated") {
+    const accountId = stringOf(object, "id");
+    if (!accountId) return "connect account ignored (no id)";
+    const chargesEnabled = object?.["charges_enabled"] === true;
+    const payoutsEnabled = object?.["payouts_enabled"] === true;
+    const status = chargesEnabled && payoutsEnabled ? "active" : "pending";
+    const { sql } = await import("./neon");
+    await sql`
+      update public.profiles
+         set stripe_account_status = ${status},
+             stripe_charges_enabled = ${chargesEnabled},
+             stripe_payouts_enabled = ${payoutsEnabled},
+             updated_at = now()
+       where stripe_account_id = ${accountId}
+    `;
+    return `connect account ${status}`;
+  }
+
   const paymentId = paymentIdOf(event);
   if (!paymentId) return "ignored (no payment reference)";
+
 
   const {
     activateVerification,
