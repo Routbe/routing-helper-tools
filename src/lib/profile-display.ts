@@ -193,46 +193,6 @@ export function parseDisplayPrefs(raw: unknown): ProfileDisplayPrefs {
   };
 }
 
-/** CSS voor de gekozen avatarrand (wordt op een wrapper rond de avatar gezet). */
-export function avatarFrameStyle(
-  frame: AvatarFrame,
-  theme: { bg: string; card: string; text: string; border: string; accent?: string },
-): Record<string, string | number> {
-  const accent = theme.accent ?? theme.border;
-  switch (frame) {
-    case "gold":
-      return {
-        padding: 3,
-        borderRadius: 999,
-        background: "linear-gradient(135deg,#e8c87a,#8a6a24 45%,#f4e2b0)",
-        boxShadow: "0 6px 24px -12px rgba(232,200,122,0.9)",
-      };
-    case "neon":
-      return {
-        padding: 3,
-        borderRadius: 999,
-        background: theme.bg,
-        border: `2px solid ${accent}`,
-        boxShadow: `0 0 0 4px color-mix(in oklab, ${accent} 18%, transparent), 0 0 26px -4px ${accent}`,
-      };
-    case "double":
-      return {
-        padding: 5,
-        borderRadius: 999,
-        border: `1px solid ${theme.border}`,
-        boxShadow: `inset 0 0 0 3px ${theme.bg}, inset 0 0 0 4px ${theme.border}`,
-      };
-    case "aurora":
-      return {
-        padding: 3,
-        borderRadius: 999,
-        background: `conic-gradient(from 180deg, ${accent}, ${theme.text}, ${accent})`,
-        boxShadow: `0 8px 30px -14px ${accent}`,
-      };
-    default:
-      return { padding: 0, borderRadius: 999 };
-  }
-}
 
 /** CSS voor de bannerkaart boven het profiel. `null` = geen banner tonen. */
 export function bannerStyleOf(
