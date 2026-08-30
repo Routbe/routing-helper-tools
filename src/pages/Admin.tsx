@@ -105,6 +105,8 @@ import {
 } from "@/lib/admin.functions";
 import { parseRoutReference } from "@/lib/reference-parser";
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
+import { EnvHealthPanel } from "@/components/admin/EnvHealthPanel";
+
 
 import type { UserSegment } from "@/lib/admin-segments";
 
