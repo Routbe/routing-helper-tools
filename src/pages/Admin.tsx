@@ -161,6 +161,17 @@ function shortDateTime(value: string) {
   return `${shortDate(value)} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
 }
 
+/** Vlagemoji + stad uit een ISO-landcode; onbekend blijft neutraal. */
+function locationBadge(country: string | null, city: string | null) {
+  const code = country?.trim().toUpperCase() ?? "";
+  if (!/^[A-Z]{2}$/.test(code)) return "🌐 Onbekend";
+  const flag = String.fromCodePoint(
+    ...[...code].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
+  );
+  return `${flag} ${city?.trim() || code}`;
+}
+
+
 const TIER_BADGE: Record<string, string> = {
   early_believer: "Early Believer",
 };
