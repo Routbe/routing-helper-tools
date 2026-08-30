@@ -37,10 +37,13 @@ export type ModeratedUser = {
   aliasSyncAttempts: number;
   aliasSyncedAt: string | null;
   aliasSyncError: string | null;
+  lastCountry: string | null;
+  lastCity: string | null;
 };
 
 const PROFILE_COLUMNS =
-  "id, display_name, username, tagline, avatar_url, blocks, tier, verified, status, is_suspended, is_banned, moderation_reason, handle_grant, alias_status, forwarding_email, created_at, is_paid, payment_method, is_early_believer, alias_sync_status, alias_sync_attempts, alias_synced_at, alias_sync_error";
+  "id, display_name, username, tagline, avatar_url, blocks, tier, verified, status, is_suspended, is_banned, moderation_reason, handle_grant, alias_status, forwarding_email, created_at, is_paid, payment_method, is_early_believer, alias_sync_status, alias_sync_attempts, alias_synced_at, alias_sync_error, subdomain_alias, last_country, last_city";
+
 
 type ProfileRow = Record<string, unknown>;
 
