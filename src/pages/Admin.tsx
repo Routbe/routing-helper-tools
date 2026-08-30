@@ -1283,6 +1283,8 @@ export default function Admin() {
         ) : null}
 
         <AdminOverviewPanel />
+        <EnvHealthPanel />
+
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           {/* Sub-tabs overflow badly on phones; a native select replaces the row below sm. */}
