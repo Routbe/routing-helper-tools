@@ -88,13 +88,7 @@ export const DEFAULT_DISPLAY_PREFS: ProfileDisplayPrefs = {
   showVcardButton: true,
 };
 
-export const AVATAR_FRAMES: { id: AvatarFrame; label: string }[] = [
-  { id: "none", label: "Geen" },
-  { id: "gold", label: "Gouden wireframe" },
-  { id: "neon", label: "Neon glow ring" },
-  { id: "double", label: "Dubbele rand" },
-  { id: "aurora", label: "Aurora gradient" },
-];
+export { AVATAR_FRAME_DEFS as AVATAR_FRAMES } from "./avatar-frames";
 
 export const BANNER_STYLES: { id: BannerStyle; label: string }[] = [
   { id: "none", label: "Geen banner" },
