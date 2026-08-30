@@ -892,96 +892,240 @@ export function ProfileEditor() {
           )}
 
           {tab === "design" && (
-            <>
-              <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
-                <h2 className="text-lg font-medium">Avatar & Header</h2>
-                <div className="space-y-2">
-                  <label className="input-label" htmlFor="p-name">
-                    Display Name
-                  </label>
-                  <Input
-                    id="p-name"
-                    value={displayName}
-                    maxLength={60}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="input-field h-11 rounded-xl"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="input-label" htmlFor="p-tag">
-                    Bio / Tagline
-                  </label>
-                  <Input
-                    id="p-tag"
-                    value={tagline}
-                    maxLength={120}
-                    placeholder="Sovereign QR infrastructure"
-                    onChange={(e) => setTagline(e.target.value)}
-                    className="input-field h-11 rounded-xl"
-                  />
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-border bg-muted/40">
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt="Avatar preview"
-                        className="h-full w-full object-cover"
+            <Accordion
+              type="single"
+              collapsible
+              defaultValue="avatar_header"
+              className="space-y-3"
+            >
+              {/* 1 — Avatar, header & kaders */}
+              <AccordionItem
+                value="avatar_header"
+                className="rounded-2xl border border-border bg-card px-4 sm:px-5"
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <span className="flex flex-1 items-center justify-between gap-3 pr-2">
+                    <span className="text-base font-medium">👤 Avatar, Header &amp; Frames</span>
+                    <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
+                      {avatarFrameLabel(prefs.avatarFrame)}
+                    </span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-5">
+                  <div className="space-y-2">
+                    <label className="input-label" htmlFor="p-name">
+                      Display Name
+                    </label>
+                    <Input
+                      id="p-name"
+                      value={displayName}
+                      maxLength={60}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className="input-field h-11 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="input-label" htmlFor="p-tag">
+                      Bio / Tagline
+                    </label>
+                    <Input
+                      id="p-tag"
+                      value={tagline}
+                      maxLength={120}
+                      placeholder="Sovereign QR infrastructure"
+                      onChange={(e) => setTagline(e.target.value)}
+                      className="input-field h-11 rounded-xl"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-border bg-muted/40">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt="Avatar preview"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <FileUploadInput
+                        type="image"
+                        value={avatarUrl}
+                        onValueChange={setAvatarUrl}
                       />
-                    ) : null}
+                    </div>
+                    {avatarUrl && (
+                      <Button variant="ghost" size="sm" onClick={() => setAvatarUrl("")}>
+                        Remove
+                      </Button>
+                    )}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <FileUploadInput type="image" value={avatarUrl} onValueChange={setAvatarUrl} />
-                  </div>
-                  {avatarUrl && (
-                    <Button variant="ghost" size="sm" onClick={() => setAvatarUrl("")}>
-                      Remove
-                    </Button>
-                  )}
-                </div>
-                <div className="space-y-2 border-t border-border pt-3">
-                  <label className="input-label">Favicon (Optional)</label>
-                  <FileUploadInput type="image" value={faviconUrl} onValueChange={setFaviconUrl} />
-                  {faviconUrl && (
-                    <Button variant="ghost" size="sm" onClick={() => setFaviconUrl("")}>
-                      Remove
-                    </Button>
-                  )}
-                  <p className="text-[11px] text-muted-foreground">
-                    By default your public page uses your avatar as browser icon. Optionally upload
-                    a separate favicon (.ico/.png) for maximum branding.
-                  </p>
-                </div>
-              </section>
 
-              <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
-                <h2 className="text-lg font-medium">Theme & Button Style</h2>
-                <p className="input-label">Theme Preset</p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {PROFILE_THEMES.map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setTheme(t.id)}
-                      className={cn(
-                        "flex flex-col gap-2 rounded-xl border p-2.5 text-left transition-colors",
-                        theme === t.id ? "border-primary ring-1 ring-primary" : "border-border",
-                      )}
-                    >
-                      <span
-                        className="block h-10 w-full rounded-lg border border-border"
-                        style={{ background: t.bg }}
-                        aria-hidden
-                      />
-                      <span className="text-xs font-medium">{t.label}</span>
-                    </button>
-                  ))}
-                </div>
-                <p className="input-label pt-2">Button Shape</p>
-                <div className="flex flex-wrap gap-2">
-                  {CARD_STYLES.map((c) => {
-                    const shapeLabel = c.label;
-                    return (
+                  <div className="space-y-2 border-t border-border pt-4">
+                    <p className="input-label">Avatarkader / rand (24 presets)</p>
+                    <AvatarFramePicker
+                      value={prefs.avatarFrame}
+                      onChange={(f) => setPref("avatarFrame", f)}
+                      avatarUrl={avatarUrl}
+                      theme={themeOf(theme)}
+                    />
+                  </div>
+
+                  <div className="space-y-2 border-t border-border pt-4">
+                    <p className="input-label">Naamaccent</p>
+                    <div className="flex flex-wrap gap-2">
+                      {NAME_ACCENTS.map((o) => (
+                        <button
+                          key={o.id}
+                          type="button"
+                          onClick={() => setPref("nameAccent", o.id)}
+                          className={cn(
+                            "h-10 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
+                            prefs.nameAccent === o.id
+                              ? "border-primary/50 bg-primary/10"
+                              : "border-border",
+                          )}
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="input-label">Statuslijn</p>
+                    <Input
+                      value={prefs.statusLine ?? ""}
+                      maxLength={60}
+                      onChange={(e) => setPref("statusLine", e.target.value || null)}
+                      placeholder="Beschikbaar voor werk"
+                      className="h-10 text-xs"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Max. 60 tekens, verschijnt onder je handle.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 border-t border-border pt-4">
+                    <label className="input-label">Favicon (optioneel)</label>
+                    <FileUploadInput
+                      type="image"
+                      value={faviconUrl}
+                      onValueChange={setFaviconUrl}
+                    />
+                    {faviconUrl && (
+                      <Button variant="ghost" size="sm" onClick={() => setFaviconUrl("")}>
+                        Remove
+                      </Button>
+                    )}
+                    <p className="text-[11px] text-muted-foreground">
+                      Standaard gebruikt je publieke pagina je avatar als browsericoon.
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 2 — Thema & kleuren */}
+              <AccordionItem
+                value="theme_colors"
+                className="rounded-2xl border border-border bg-card px-4 sm:px-5"
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <span className="flex flex-1 items-center justify-between gap-3 pr-2">
+                    <span className="text-base font-medium">🎨 Thema &amp; Kleurenschema</span>
+                    <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
+                      {PROFILE_THEMES.find((t) => t.id === theme)?.label ?? theme}
+                    </span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-5">
+                  <p className="input-label">Themapreset</p>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {PROFILE_THEMES.map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setTheme(t.id)}
+                        className={cn(
+                          "flex flex-col gap-2 rounded-xl border p-2.5 text-left transition-colors",
+                          theme === t.id ? "border-primary ring-1 ring-primary" : "border-border",
+                        )}
+                      >
+                        <span
+                          className="block h-10 w-full rounded-lg border border-border"
+                          style={{ background: t.bg }}
+                          aria-hidden
+                        />
+                        <span className="text-xs font-medium">{t.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="space-y-3 border-t border-border pt-4">
+                    <div>
+                      <p className="text-sm font-medium">Canvas &amp; patroon</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Laat leeg om het gekozen thema te volgen.
+                      </p>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {(
+                        [
+                          { key: "canvasColor" as const, label: "Achtergrondkleur" },
+                          { key: "patternColor" as const, label: "Patroon- en randkleur" },
+                        ]
+                      ).map((f) => (
+                        <div key={f.key} className="space-y-1.5">
+                          <p className="input-label">{f.label}</p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              aria-label={f.label}
+                              value={prefs[f.key] ?? "#111111"}
+                              onChange={(e) => setPref(f.key, e.target.value)}
+                              className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-border bg-transparent p-1"
+                            />
+                            <Input
+                              value={prefs[f.key] ?? ""}
+                              onChange={(e) => setPref(f.key, e.target.value || null)}
+                              placeholder="#0d0d0d"
+                              spellCheck={false}
+                              className="h-10 font-mono text-xs"
+                            />
+                            {prefs[f.key] && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-10 shrink-0 text-xs"
+                                onClick={() => setPref(f.key, null)}
+                              >
+                                Wis
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 3 — Knoppen & typografie */}
+              <AccordionItem
+                value="buttons_typography"
+                className="rounded-2xl border border-border bg-card px-4 sm:px-5"
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <span className="flex flex-1 items-center justify-between gap-3 pr-2">
+                    <span className="text-base font-medium">🔘 Knoppen &amp; Typografie</span>
+                    <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
+                      {CARD_STYLES.find((c) => c.id === cardStyle)?.label ?? cardStyle}
+                    </span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-5">
+                  <p className="input-label">Knopvorm</p>
+                  <div className="flex flex-wrap gap-2">
+                    {CARD_STYLES.map((c) => (
                       <button
                         key={c.id}
                         type="button"
@@ -991,173 +1135,85 @@ export function ProfileEditor() {
                           cardStyle === c.id ? "border-primary/50 bg-primary/10" : "border-border",
                         )}
                       >
-                        {shapeLabel}
+                        {c.label}
                       </button>
-                    );
-                  })}
-                </div>
-              </section>
-
-              <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
-                <h2 className="text-lg font-medium">Typography</h2>
-                <div className="flex flex-wrap gap-2">
-                  {TYPOGRAPHY_OPTIONS.map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setPref("typography", t.id)}
-                      className={cn(
-                        "h-10 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
-                        prefs.typography === t.id
-                          ? "border-primary/50 bg-primary/10"
-                          : "border-border",
-                      )}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
-                <h2 className="text-lg font-medium">Background Style</h2>
-                <div className="flex flex-wrap gap-2">
-                  {BACKGROUND_OPTIONS.map((o) => (
-                    <button
-                      key={o.id}
-                      type="button"
-                      onClick={() => setPref("backgroundStyle", o.id)}
-                      className={cn(
-                        "h-10 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
-                        prefs.backgroundStyle === o.id
-                          ? "border-primary/50 bg-primary/10"
-                          : "border-border",
-                      )}
-                    >
-                      {o.label}
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              <section className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-5">
-                <div>
-                  <h2 className="text-lg font-medium">Canvas &amp; patroon</h2>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Laat leeg om het gekozen thema te volgen.
-                  </p>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {(
-                    [
-                      { key: "canvasColor" as const, label: "Achtergrondkleur" },
-                      { key: "patternColor" as const, label: "Patroon- en randkleur" },
-                    ]
-                  ).map((f) => (
-                    <div key={f.key} className="space-y-1.5">
-                      <p className="input-label">{f.label}</p>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          aria-label={f.label}
-                          value={prefs[f.key] ?? "#111111"}
-                          onChange={(e) => setPref(f.key, e.target.value)}
-                          className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-border bg-transparent p-1"
-                        />
-                        <Input
-                          value={prefs[f.key] ?? ""}
-                          onChange={(e) => setPref(f.key, e.target.value || null)}
-                          placeholder="#0d0d0d"
-                          spellCheck={false}
-                          className="h-10 font-mono text-xs"
-                        />
-                        {prefs[f.key] && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-10 shrink-0 text-xs"
-                            onClick={() => setPref(f.key, null)}
-                          >
-                            Wis
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-5">
-                <h2 className="text-lg font-medium">Banner</h2>
-                <div className="flex flex-wrap gap-2">
-                  {BANNER_STYLES.map((o) => (
-                    <button
-                      key={o.id}
-                      type="button"
-                      onClick={() => setPref("bannerStyle", o.id)}
-                      className={cn(
-                        "h-10 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
-                        prefs.bannerStyle === o.id
-                          ? "border-primary/50 bg-primary/10"
-                          : "border-border",
-                      )}
-                    >
-                      {o.label}
-                    </button>
-                  ))}
-                </div>
-                {prefs.bannerStyle === "gradient" && (
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <p className="input-label">Van</p>
-                      <input
-                        type="color"
-                        aria-label="Bannerkleur van"
-                        value={prefs.bannerFrom ?? "#1a1a1a"}
-                        onChange={(e) => setPref("bannerFrom", e.target.value)}
-                        className="h-10 w-full cursor-pointer rounded-lg border border-border bg-transparent p-1"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <p className="input-label">Naar</p>
-                      <input
-                        type="color"
-                        aria-label="Bannerkleur naar"
-                        value={prefs.bannerTo ?? "#c9a84c"}
-                        onChange={(e) => setPref("bannerTo", e.target.value)}
-                        className="h-10 w-full cursor-pointer rounded-lg border border-border bg-transparent p-1"
-                      />
-                    </div>
+                    ))}
                   </div>
-                )}
-                {prefs.bannerStyle === "image" && (
-                  <div className="space-y-1.5">
-                    <p className="input-label">Afbeeldings-URL (https)</p>
-                    <Input
-                      value={prefs.bannerImageUrl ?? ""}
-                      onChange={(e) => setPref("bannerImageUrl", e.target.value || null)}
-                      placeholder="https://…/banner.jpg"
-                      spellCheck={false}
-                      className="h-10 text-xs"
+                  <p className="input-label pt-2">Typografie</p>
+                  <div className="flex flex-wrap gap-2">
+                    {TYPOGRAPHY_OPTIONS.map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setPref("typography", t.id)}
+                        className={cn(
+                          "h-10 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
+                          prefs.typography === t.id
+                            ? "border-primary/50 bg-primary/10"
+                            : "border-border",
+                        )}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-start justify-between gap-4 border-t border-border pt-4">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">&ldquo;Contact opslaan&rdquo;-knop</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Bezoekers bewaren je profiel als contactkaart (vCard).
+                      </p>
+                    </div>
+                    <Switch
+                      aria-label="Contact opslaan-knop tonen"
+                      checked={prefs.showVcardButton}
+                      onCheckedChange={(v) => setPref("showVcardButton", v)}
                     />
                   </div>
-                )}
-              </section>
+                  <div className="flex items-start justify-between gap-4 border-t border-border pt-4">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">&ldquo;Made with ROUT&rdquo;-voetnoot</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {verified
+                          ? "Als geverifieerd lid is je profiel standaard white-label."
+                          : "Gratis profielen tonen de subtiele ROUT-voetnoot."}
+                      </p>
+                    </div>
+                    <Switch
+                      aria-label="Made with ROUT tonen"
+                      disabled={!verified}
+                      checked={verified ? (prefs.showWatermark ?? false) : true}
+                      onCheckedChange={(v) => setPref("showWatermark", v)}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-              <section className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-5">
-                <h2 className="text-lg font-medium">Avatar &amp; naam</h2>
-                <div className="space-y-2">
-                  <p className="input-label">Avatarkader</p>
+              {/* 4 — Achtergrond & visual FX */}
+              <AccordionItem
+                value="background_effects"
+                className="rounded-2xl border border-border bg-card px-4 sm:px-5"
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <span className="flex flex-1 items-center justify-between gap-3 pr-2">
+                    <span className="text-base font-medium">🖼️ Achtergrond &amp; Visual FX</span>
+                    <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
+                      {BACKGROUND_OPTIONS.find((o) => o.id === prefs.backgroundStyle)?.label ??
+                        prefs.backgroundStyle}
+                    </span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-5">
+                  <p className="input-label">Achtergrondstijl</p>
                   <div className="flex flex-wrap gap-2">
-                    {AVATAR_FRAMES.map((o) => (
+                    {BACKGROUND_OPTIONS.map((o) => (
                       <button
                         key={o.id}
                         type="button"
-                        onClick={() => setPref("avatarFrame", o.id)}
+                        onClick={() => setPref("backgroundStyle", o.id)}
                         className={cn(
                           "h-10 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
-                          prefs.avatarFrame === o.id
+                          prefs.backgroundStyle === o.id
                             ? "border-primary/50 bg-primary/10"
                             : "border-border",
                         )}
@@ -1166,18 +1222,16 @@ export function ProfileEditor() {
                       </button>
                     ))}
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <p className="input-label">Naamaccent</p>
+                  <p className="input-label pt-2">Banner</p>
                   <div className="flex flex-wrap gap-2">
-                    {NAME_ACCENTS.map((o) => (
+                    {BANNER_STYLES.map((o) => (
                       <button
                         key={o.id}
                         type="button"
-                        onClick={() => setPref("nameAccent", o.id)}
+                        onClick={() => setPref("bannerStyle", o.id)}
                         className={cn(
                           "h-10 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
-                          prefs.nameAccent === o.id
+                          prefs.bannerStyle === o.id
                             ? "border-primary/50 bg-primary/10"
                             : "border-border",
                         )}
@@ -1186,58 +1240,45 @@ export function ProfileEditor() {
                       </button>
                     ))}
                   </div>
-                </div>
-                <div className="space-y-1.5">
-                  <p className="input-label">Statuslijn</p>
-                  <Input
-                    value={prefs.statusLine ?? ""}
-                    maxLength={60}
-                    onChange={(e) => setPref("statusLine", e.target.value || null)}
-                    placeholder="Beschikbaar voor werk"
-                    className="h-10 text-xs"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Max. 60 tekens, verschijnt onder je handle.
-                  </p>
-                </div>
-              </section>
-
-
-
-              <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
-                <h2 className="text-lg font-medium">Branding</h2>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">&ldquo;Made with ROUT&rdquo;-voetnoot</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {verified
-                        ? "Als geverifieerd lid is je profiel standaard white-label. Zet het merkje aan als je ROUT wil steunen."
-                        : "Gratis profielen tonen de subtiele ROUT-voetnoot. Verifieer je account voor een white-label profiel."}
-                    </p>
-                  </div>
-                  <Switch
-                    aria-label="Made with ROUT tonen"
-                    disabled={!verified}
-                    checked={verified ? (prefs.showWatermark ?? false) : true}
-                    onCheckedChange={(v) => setPref("showWatermark", v)}
-                  />
-                </div>
-                <div className="flex items-start justify-between gap-4 border-t border-border pt-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">&ldquo;Contact opslaan&rdquo;-knop</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Bezoekers bewaren je profiel als contactkaart (vCard) in hun adresboek.
-                    </p>
-                  </div>
-                  <Switch
-                    aria-label="Contact opslaan-knop tonen"
-                    checked={prefs.showVcardButton}
-                    onCheckedChange={(v) => setPref("showVcardButton", v)}
-                  />
-                </div>
-              </section>
-
-            </>
+                  {prefs.bannerStyle === "gradient" && (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <p className="input-label">Van</p>
+                        <input
+                          type="color"
+                          aria-label="Bannerkleur van"
+                          value={prefs.bannerFrom ?? "#1a1a1a"}
+                          onChange={(e) => setPref("bannerFrom", e.target.value)}
+                          className="h-10 w-full cursor-pointer rounded-lg border border-border bg-transparent p-1"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <p className="input-label">Naar</p>
+                        <input
+                          type="color"
+                          aria-label="Bannerkleur naar"
+                          value={prefs.bannerTo ?? "#c9a84c"}
+                          onChange={(e) => setPref("bannerTo", e.target.value)}
+                          className="h-10 w-full cursor-pointer rounded-lg border border-border bg-transparent p-1"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {prefs.bannerStyle === "image" && (
+                    <div className="space-y-1.5">
+                      <p className="input-label">Afbeeldings-URL (https)</p>
+                      <Input
+                        value={prefs.bannerImageUrl ?? ""}
+                        onChange={(e) => setPref("bannerImageUrl", e.target.value || null)}
+                        placeholder="https://…/banner.jpg"
+                        spellCheck={false}
+                        className="h-10 text-xs"
+                      />
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           )}
 
           {tab === "analytics" && (
