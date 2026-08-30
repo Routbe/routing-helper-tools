@@ -1603,7 +1603,7 @@ export function ProfileEditor() {
 
         </div>
 
-        {/* Live preview — desktop: pinned next to the editor */}
+        
         {/* Live preview — desktop: pinned next to the editor, altijd ónder de vaste header (z-10 < z-50) */}
         <aside className="z-10 hidden lg:sticky lg:top-24 lg:block lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overscroll-contain">
 
