@@ -118,7 +118,7 @@ export function ProfileView({
               {initialsFrom(profile.display_name || profile.username)}
             </div>
           )}
-        </div>
+        </AvatarFrameWrapper>
 
         <h1 className="mt-4 flex items-center gap-1.5 break-words text-center font-display text-2xl">
           <span style={nameStyle}>{profile.display_name || `@${profile.username}`}</span>
