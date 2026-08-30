@@ -1646,37 +1646,47 @@ export function ProfileEditor() {
           <div className="transition-all duration-300 ease-out">
           {previewDevice === "mobile" ? (
             /* Smartphone: 9:19.5, ronde hoeken, dunne bezel en camera-eiland */
-            <div className="mx-auto w-full max-w-[290px] rounded-[2.6rem] border border-border/70 bg-foreground/90 p-[10px] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)] transition-all duration-300">
-              <div className="relative overflow-hidden rounded-[2rem] bg-background">
+            <div className="mx-auto w-full max-w-[290px] overflow-hidden rounded-[36px] border border-border/70 bg-foreground/90 p-[10px] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)] transition-all duration-300">
+              <div className="relative w-full overflow-hidden rounded-[28px] bg-background">
                 <span className="absolute left-1/2 top-2 z-10 flex h-3 w-20 -translate-x-1/2 items-center justify-center gap-1 rounded-full bg-foreground/80">
                   <span className="h-1 w-8 rounded-full bg-background/25" />
                   <span className="h-1.5 w-1.5 rounded-full bg-background/35" />
                 </span>
-                <div className="scrollbar-slim aspect-[9/19.5] overflow-y-auto text-foreground">
+                <div className="preview-noscroll aspect-[9/19.5] w-full overflow-y-auto overflow-x-hidden text-foreground">
                   <ProfileView profile={previewDraft} free={!verified} />
                 </div>
               </div>
             </div>
           ) : (
-            /* Laptop: matte bezel met webcamstip, hinge en onderdek met trackpad-lip */
+            /* Laptop: metalen bezel met webcamstip, hinge en breder toetsenborddek */
             <div className="mx-auto w-full max-w-[520px] transition-all duration-300">
-              <div className="rounded-t-2xl bg-foreground/90 p-[10px] pt-[18px] shadow-[0_20px_50px_-24px_rgba(0,0,0,0.5)]">
-                <span className="mx-auto mb-[8px] block h-1 w-1 rounded-full bg-background/40" />
-                <div className="scrollbar-slim aspect-[16/10] overflow-y-auto rounded-[4px] bg-background text-foreground">
+              {/* Scherm */}
+              <div className="relative rounded-t-2xl border border-zinc-700/80 bg-zinc-900 p-2.5 pt-4 shadow-2xl shadow-black/60">
+                <span className="absolute left-1/2 top-1.5 h-1 w-1 -translate-x-1/2 rounded-full bg-zinc-500" aria-hidden />
+                <div className="preview-noscroll aspect-[16/10] w-full overflow-hidden overflow-y-auto rounded-[4px] bg-background text-foreground">
                   {/* 1:1 desktopproporties: render op 1280px en zoom mee met de kaart */}
-                  <div className="w-[1280px]" style={{ zoom: 0.26 }}>
+                  <div className="w-[1280px] origin-top-left" style={{ zoom: 0.26 }}>
                     <ProfileView profile={previewDraft} free={!verified} layout="wide" />
                   </div>
-
                 </div>
               </div>
               {/* Hinge */}
-              <div className="mx-auto h-1.5 w-[102%] -translate-x-[1%] rounded-sm bg-foreground/70" />
-              {/* Onderdek + trackpad-lip */}
-              <div className="mx-auto h-2.5 w-[112%] -translate-x-[5.4%] rounded-b-xl bg-foreground/80" />
-              <div className="mx-auto h-1.5 w-16 rounded-b-full bg-foreground/60" />
+              <div className="mx-auto h-1 w-[102%] -translate-x-[1%] rounded-sm bg-zinc-700" />
+              {/* Onderdek: breder dan het scherm, met verzonken toetsenbordtray en trackpad */}
+              <div className="relative -mx-[4%] w-[108%] rounded-b-2xl border border-t-0 border-zinc-700/80 bg-gradient-to-b from-zinc-800 to-zinc-900 px-4 pb-2 pt-2 shadow-2xl shadow-black/60">
+                <div className="rounded-md bg-zinc-950/50 p-1.5">
+                  <div className="grid grid-cols-12 gap-1 opacity-40">
+                    {Array.from({ length: 48 }).map((_, i) => (
+                      <span key={i} className="h-1.5 rounded-[2px] bg-zinc-400" />
+                    ))}
+                  </div>
+                </div>
+                <div className="mx-auto mt-1.5 h-3 w-24 rounded-[3px] border border-zinc-600/70 bg-zinc-800/70" />
+              </div>
+              <div className="mx-auto h-1 w-[70%] rounded-b-full bg-black/40 blur-[2px]" aria-hidden />
             </div>
           )}
+
           </div>
           <p className="mt-2 text-center text-[11px] text-muted-foreground">
             Wijzigingen zijn direct zichtbaar — opslaan maakt ze live.
