@@ -105,51 +105,82 @@ export async function listUsersPage(opts: {
 
   const term = (opts.query ?? "").trim().replace(/^@/, "");
   const isUuid = /^[0-9a-f-]{36}$/i.test(term);
+  // "2026", "2026-08" of "2026-08-14" → filter op registratiedatum.
+  const dateMatch = /^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?$/.exec(term);
 
-  let q = dbAdmin
-    .from("profiles")
-    .select(PROFILE_COLUMNS, { count: "exact" })
-    .order("created_at", { ascending: false });
+  const buildQuery = (cols: string) => {
+    let q = dbAdmin
+      .from("profiles")
+      .select(cols, { count: "exact" })
+      .order("created_at", { ascending: false });
 
-  switch (opts.segment) {
-    case "free":
-      q = q.eq("tier", "free");
-      break;
-    case "verified_paid":
-      q = q.eq("verified", true).eq("is_paid", true);
-      break;
-    case "alias_unsynced":
-      // NULL counts as "never synced yet", which is also unsynced.
-      q = q.or("alias_sync_status.neq.synced,alias_sync_status.is.null");
-      break;
-    case "suspended_or_banned":
-      q = q.or("is_suspended.eq.true,is_banned.eq.true");
-      break;
-    default:
-      break;
-  }
-
-  if (term) {
-    if (isUuid) q = q.eq("id", term);
-    else if (term.includes("@")) {
-      // E-mail search: resolve through the auth admin API first.
-      const { data: list } = await dbAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-      const ids = ((list?.users ?? []) as Array<{ id: string; email?: string }>)
-        .filter((u) => u.email?.toLowerCase().includes(term.toLowerCase()))
-        .map((u) => u.id);
-      if (ids.length === 0) return { rows: [], total: 0, page, perPage };
-      q = q.in("id", ids);
-    } else {
-      q = q.or(`username.ilike.%${term}%,display_name.ilike.%${term}%`);
+    switch (opts.segment) {
+      case "free":
+        q = q.eq("tier", "free");
+        break;
+      case "verified_paid":
+        q = q.eq("verified", true).eq("is_paid", true);
+        break;
+      case "alias_unsynced":
+        // NULL counts as "never synced yet", which is also unsynced.
+        q = q.or("alias_sync_status.neq.synced,alias_sync_status.is.null");
+        break;
+      case "suspended_or_banned":
+        q = q.or("is_suspended.eq.true,is_banned.eq.true");
+        break;
+      default:
+        break;
     }
+    return q;
+  };
+
+  let emailIds: string[] | null = null;
+  if (term && term.includes("@")) {
+    // E-mail search: resolve through the auth admin API first.
+    const { data: list } = await dbAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    emailIds = ((list?.users ?? []) as Array<{ id: string; email?: string }>)
+      .filter((u) => u.email?.toLowerCase().includes(term.toLowerCase()))
+      .map((u) => u.id);
+    if (emailIds.length === 0) return { rows: [], total: 0, page, perPage };
   }
 
-  const { data, count } = await q.range(from, from + perPage - 1);
+  const applySearch = (q: ReturnType<typeof buildQuery>) => {
+    if (!term) return q;
+    if (isUuid) return q.eq("id", term);
+    if (emailIds) return q.in("id", emailIds);
+    if (dateMatch) {
+      const [, year, month, day] = dateMatch;
+      const start = new Date(
+        Date.UTC(Number(year), month ? Number(month) - 1 : 0, day ? Number(day) : 1),
+      );
+      const end = new Date(start);
+      if (day) end.setUTCDate(end.getUTCDate() + 1);
+      else if (month) end.setUTCMonth(end.getUTCMonth() + 1);
+      else end.setUTCFullYear(end.getUTCFullYear() + 1);
+      return q.gte("created_at", start.toISOString()).lt("created_at", end.toISOString());
+    }
+    return q.or(
+      `username.ilike.%${term}%,display_name.ilike.%${term}%,subdomain_alias.ilike.%${term}%`,
+    );
+  };
+
+  const { data, count } = await selectTolerant<ProfileRow[]>(
+    PROFILE_COLUMNS,
+    (cols) =>
+      applySearch(buildQuery(cols)).range(from, from + perPage - 1) as PromiseLike<{
+        data: ProfileRow[] | null;
+        error: unknown;
+        count?: number | null;
+      }>,
+    ["last_country", "last_city"],
+  ).then((r) => ({ data: r.data, count: (r as { count?: number | null }).count ?? null }));
+
   const rows: ModeratedUser[] = [];
   for (const row of data ?? []) {
     rows.push(mapProfile(row as ProfileRow, await emailFor(String((row as ProfileRow)["id"]))));
   }
   return { rows, total: count ?? rows.length, page, perPage };
+
 }
 
 /** Suspend / unsuspend: hides the public profile and disables dynamic QR redirects. */
