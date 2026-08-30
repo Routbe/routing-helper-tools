@@ -1367,18 +1367,20 @@ export type AdminKpis = {
 export async function getAdminKpis(): Promise<AdminKpis> {
   const { dbAdmin } = await import("@/lib/db/admin.server");
   const { improvmxKey } = await import("./alias.server");
+  const { sql } = await import("@/lib/neon");
 
-  const [activeUsers, pendingVerifications, incompletePayments, pendingSepaPayments, failedAliasSyncs] =
+  const [totalUsers, pendingUnique, incompletePayments, pendingSepaPayments, failedAliasSyncs] =
     await Promise.all([
-      dbAdmin
-        .from("profiles")
-        .select("id", { count: "exact", head: true })
-        .eq("is_suspended", false)
-        .eq("is_banned", false),
-      dbAdmin
-        .from("verification_payments")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "pending"),
+      // "Actieve gebruikers" = alle geregistreerde profielen in Neon.
+      sql`select count(*)::int as n from public.profiles` as Promise<
+        Array<Record<string, unknown>>
+      >,
+      // Eén openstaande verificatie per gebruiker — nooit meer dan het aantal leden.
+      sql`
+        select count(distinct user_id)::int as n
+          from public.verification_payments
+         where status = 'pending'
+      ` as Promise<Array<Record<string, unknown>>>,
       dbAdmin
         .from("verification_payments")
         .select("id", { count: "exact", head: true })
@@ -1394,15 +1396,19 @@ export async function getAdminKpis(): Promise<AdminKpis> {
         .eq("alias_sync_status", "failed"),
     ]);
 
+  const activeUsers = Number(totalUsers[0]?.["n"] ?? 0);
+  const pendingVerifications = Math.min(Number(pendingUnique[0]?.["n"] ?? 0), activeUsers);
+
   return {
-    activeUsers: activeUsers.count ?? 0,
-    pendingVerifications: pendingVerifications.count ?? 0,
+    activeUsers,
+    pendingVerifications,
     incompletePayments: incompletePayments.count ?? 0,
     pendingSepaPayments: pendingSepaPayments.count ?? 0,
     failedAliasSyncs: failedAliasSyncs.count ?? 0,
     improvmxConfigured: Boolean(improvmxKey()),
   };
 }
+
 
 /* ------------------------------------------------------------------ *
  * SEPA reference auto-parsing                                         *
