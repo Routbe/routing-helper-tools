@@ -105,6 +105,8 @@ import {
 } from "@/lib/admin.functions";
 import { parseRoutReference } from "@/lib/reference-parser";
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
+import { EnvHealthPanel } from "@/components/admin/EnvHealthPanel";
+
 
 import type { UserSegment } from "@/lib/admin-segments";
 
@@ -160,6 +162,17 @@ function shortDateTime(value: string) {
   const d = new Date(value);
   return `${shortDate(value)} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
 }
+
+/** Vlagemoji + stad uit een ISO-landcode; onbekend blijft neutraal. */
+function locationBadge(country: string | null, city: string | null) {
+  const code = country?.trim().toUpperCase() ?? "";
+  if (!/^[A-Z]{2}$/.test(code)) return "🌐 Onbekend";
+  const flag = String.fromCodePoint(
+    ...[...code].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
+  );
+  return `${flag} ${city?.trim() || code}`;
+}
+
 
 const TIER_BADGE: Record<string, string> = {
   early_believer: "Early Believer",
@@ -1272,6 +1285,8 @@ export default function Admin() {
         ) : null}
 
         <AdminOverviewPanel />
+        <EnvHealthPanel />
+
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           {/* Sub-tabs overflow badly on phones; a native select replaces the row below sm. */}
@@ -1436,6 +1451,10 @@ export default function Admin() {
                             <p className="font-mono text-[10px] text-muted-foreground">
                               {row.userId}
                             </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              {locationBadge(row.lastCountry, row.lastCity)}
+                            </p>
+
                             <SyncBadge
                               status={row.aliasSyncStatus}
                               at={row.aliasSyncedAt}

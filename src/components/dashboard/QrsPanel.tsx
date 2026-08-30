@@ -168,11 +168,20 @@ export function QrsPanel() {
         (i) => !q || i.title.toLowerCase().includes(q) || i.subtitle.toLowerCase().includes(q),
       );
 
+    // `created_at` kan een string, Date of null zijn (afhankelijk van de bron),
+    // dus altijd normaliseren naar een timestamp voordat we sorteren.
+    const time = (value: unknown) => {
+      if (value instanceof Date) return value.getTime();
+      const parsed = value ? new Date(String(value)).getTime() : NaN;
+      return Number.isNaN(parsed) ? 0 : parsed;
+    };
+
     return filtered.sort((a, b) => {
       if (sort === "scans") return b.scans - a.scans;
-      if (sort === "alpha") return a.title.localeCompare(b.title);
-      return b.created_at.localeCompare(a.created_at);
+      if (sort === "alpha") return String(a.title).localeCompare(String(b.title));
+      return time(b.created_at) - time(a.created_at);
     });
+
   }, [saved, tracked, tab, query, sort]);
 
   // Bewerk bestemming: de short link / QR blijft ongewijzigd, alleen de

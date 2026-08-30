@@ -540,7 +540,22 @@
 }
 
 /* Dunne, luxe scrollbar die netjes binnen de preview blijft. */
+/* Scrollbaar zonder zichtbare balk — voor mockup-previews (telefoon/laptop). */
+@utility preview-noscroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
 @utility scrollbar-slim {
+
   scrollbar-width: thin;
   scrollbar-color: color-mix(in oklab, currentColor 22%, transparent) transparent;
   scroll-behavior: smooth;

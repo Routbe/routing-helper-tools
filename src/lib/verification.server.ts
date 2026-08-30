@@ -536,9 +536,12 @@ export async function activateVerification(paymentId: string, providerRef: strin
            verified = ${hasLegalName},
            is_early_believer = true,
            status = 'active',
+           -- Betaalde leden krijgen meteen het Pro-subdomein ([handle].r.rout.be).
+           subdomain_tier = case when subdomain_tier = 'root_lifetime' then subdomain_tier else 'pro' end,
            verified_at = case when ${hasLegalName} then now() else verified_at end,
            updated_at = now()
      where id = ${userId}
+
   `;
 
   await sql`
