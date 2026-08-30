@@ -36,6 +36,33 @@ export function toSessionUser(row: Row): SessionUser {
   };
 }
 
+/**
+ * Best-effort, coarse location from the edge request headers.
+ *
+ * No IP address is stored — only the country code and city the platform
+ * already derived, so the admin portal can show "🇧🇪 Brussel" without keeping
+ * a tracking log.
+ */
+async function recordApproximateLocation(userId: string) {
+  try {
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const country =
+      getRequestHeader("x-vercel-ip-country") ?? getRequestHeader("cf-ipcountry") ?? null;
+    const rawCity = getRequestHeader("x-vercel-ip-city") ?? getRequestHeader("cf-ipcity") ?? null;
+    const city = rawCity ? decodeURIComponent(rawCity) : null;
+    if (!country && !city) return;
+    await sql`
+      update public.profiles
+         set last_country = coalesce(${country}, last_country),
+             last_city = coalesce(${city}, last_city),
+             last_location_at = now()
+       where id = ${userId}
+    `;
+  } catch {
+    /* locatie is puur informatief — nooit een blokkade voor inloggen */
+  }
+}
+
 /** Issues a session row and returns the raw token for the cookie. */
 export async function createSession(
   userId: string,
@@ -50,11 +77,13 @@ export async function createSession(
     returning expires_at
   `) as Row[];
   await sql`update public.users set last_sign_in_at = now(), updated_at = now() where id = ${userId}`;
+  await recordApproximateLocation(userId);
   // Signing in always lifts a self-imposed freeze.
   const { reactivateOnSignIn } = await import("@/lib/account-status.server");
   await reactivateOnSignIn(userId);
   return { token, expiresAt: rows[0]?.["expires_at"] as string };
 }
+
 
 /** Resolves a raw cookie token to its user, sliding the last-seen stamp. */
 export async function readSession(token: string | null | undefined): Promise<SessionUser | null> {
